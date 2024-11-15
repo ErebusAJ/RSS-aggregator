@@ -52,12 +52,29 @@ func (q *Queries) DeleteUser(ctx context.Context, apiKey string) error {
 	return err
 }
 
-const getUser = `-- name: GetUser :many
+const getUserByApiKey = `-- name: GetUserByApiKey :one
+SELECT id, name, created_at, updated_at, api_key FROM users WHERE api_key=$1
+`
+
+func (q *Queries) GetUserByApiKey(ctx context.Context, apiKey string) (User, error) {
+	row := q.db.QueryRowContext(ctx, getUserByApiKey, apiKey)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Name,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.ApiKey,
+	)
+	return i, err
+}
+
+const getUsers = `-- name: GetUsers :many
 SELECT id, name, created_at, updated_at, api_key FROM users
 `
 
-func (q *Queries) GetUser(ctx context.Context) ([]User, error) {
-	rows, err := q.db.QueryContext(ctx, getUser)
+func (q *Queries) GetUsers(ctx context.Context) ([]User, error) {
+	rows, err := q.db.QueryContext(ctx, getUsers)
 	if err != nil {
 		return nil, err
 	}
@@ -83,21 +100,4 @@ func (q *Queries) GetUser(ctx context.Context) ([]User, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-const getUserByApiKey = `-- name: GetUserByApiKey :one
-SELECT id, name, created_at, updated_at, api_key FROM users WHERE api_key=$1
-`
-
-func (q *Queries) GetUserByApiKey(ctx context.Context, apiKey string) (User, error) {
-	row := q.db.QueryRowContext(ctx, getUserByApiKey, apiKey)
-	var i User
-	err := row.Scan(
-		&i.ID,
-		&i.Name,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.ApiKey,
-	)
-	return i, err
 }

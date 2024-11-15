@@ -46,26 +46,47 @@ func(cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 }
 
 
-// GetUser function
-func(cfg *apiConfig) handlerGetUser(w http.ResponseWriter, r *http.Request){
-	users, err := cfg.DB.GetUser(r.Context())
+// GetUsers function
+// Retreives all the users form DB
+func(cfg *apiConfig) handlerGetUsers(w http.ResponseWriter, r *http.Request){
+	users, err := cfg.DB.GetUsers(r.Context())
 	if err != nil {
 		errorHandler(w, http.StatusInternalServerError, "couldn't retrieve users")
 		log.Printf("couldn't retrieve users: %v", err)
 		return
 	}
 
-	jsonHandler(w, http.StatusOK, users)
+	for _, user := range users{
+		jsonHandler(w, http.StatusOK, databaseUserToUser(user))
+	}
+}
+
+
+// GetUserByApiKey function
+// Called through middlewareAuth
+// Retreives user by apikey
+func(cfg *apiConfig) handlerGetUserByApiKey(w http.ResponseWriter, r *http.Request, user database.User){
+	user, err := cfg.DB.GetUserByApiKey(r.Context(), user.ApiKey)
+	if err != nil{
+		errorHandler(w, http.StatusNotFound, "couldn't find user")
+		return
+	}
+
+	jsonHandler(w, http.StatusFound, user)
 }
 
 
 // DeleteUser handler
+// Deletes a user if he's authenticated to do it
+// Called by a middleware auth
+// Uses apiKey to delete user
 func(cfg *apiConfig) handlerDeleteUser(w http.ResponseWriter, r *http.Request, user database.User){
 	err := cfg.DB.DeleteUser(r.Context(), user.ApiKey)
 	if err != nil {
 		errorHandler(w, http.StatusInternalServerError, "couldn't delete user")
 		log.Printf("couldn't delete user: %v", err)
+		return
 	}
 
-	jsonHandler(w, http.StatusOK, struct{Message string `json:"msg"`}{Message: "successfully deleted user"})
+	jsonHandler(w, http.StatusOK, Message{Text: "successfully deleted user"})
 }

@@ -17,6 +17,7 @@ func jsonHandler(w http.ResponseWriter, code int, payload interface{}){
 	data, err := json.Marshal(payload)
 	if err != nil {
 		log.Printf("error encoding to JSON: %v", err)
+		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
@@ -29,6 +30,7 @@ func jsonHandler(w http.ResponseWriter, code int, payload interface{}){
 func errorHandler(w http.ResponseWriter, code int, msg string){
 	if code > 499{
 		log.Printf("server side erro 5xx: %v", msg)
+		return
 	}
 
 	type errResponse struct{

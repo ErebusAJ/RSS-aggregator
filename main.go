@@ -21,7 +21,7 @@ type apiConfig struct{
 }
 
 func main(){
-	fmt.Println("\t Welcome To Rss Aggregator \t")
+	fmt.Println("\t Welcome To RSS Aggregator \t")
 
 
 	//Load the godotenv
@@ -75,10 +75,17 @@ func main(){
 	v1Router := chi.NewRouter()
 	router.Mount("/v1", v1Router)
 
-	v1Router.Get("/user", apiCfg.handlerGetUser)
+	//Users 
+	v1Router.Get("/users", apiCfg.handlerGetUsers)
+	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByApiKey))
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
 	v1Router.Delete("/user", apiCfg.middlewareAuth(apiCfg.handlerDeleteUser))
 	
+	//Feeds
+	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)
+	v1Router.Post("/feed", apiCfg.middlewareAuth(apiCfg.handlerCreateFeed))
+	v1Router.Delete("/feed", apiCfg.middlewareAuth(apiCfg.handlerDeleteFeed))
+
 
 
 	// Server configuration
