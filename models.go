@@ -13,7 +13,7 @@ type Users struct{
 	ID uuid.UUID `json:"id"`
 	Name string `json:"name"`
 	CreatedAt time.Time `json:"created_at"`
-	UpdatedAit time.Time `json:"updated_at"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 func databaseUserToUser(user database.User) Users{
@@ -21,7 +21,7 @@ func databaseUserToUser(user database.User) Users{
 		ID: user.ID,
 		Name: user.Name,
 		CreatedAt: user.CreatedAt,
-		UpdatedAit: user.UpdatedAt,
+		UpdatedAt: user.UpdatedAt,
 	}
 }
 
@@ -51,4 +51,24 @@ func databaseFeedToFeed(feed database.Feed) Feed{
 // A struct for msg
 type Message struct{
 	Text string `json:"message"`
+}
+
+
+// Struct and function for feed_follows table
+type FeedFollows struct{
+	ID uuid.UUID `json:"id"`
+	CreatedAt time.Time `json:"created_at"`
+	UpdatedAt time.Time `json:"updated_at"`
+	UserID uuid.UUID `json:"user_id"`
+	FeedID uuid.UUID `json:"feed_d"`
+}
+
+func databaseFeedFollowsToFeedFollows(feedFollows database.FeedFollow) FeedFollows{
+	return FeedFollows{
+		ID: feedFollows.ID,
+		CreatedAt: feedFollows.CreatedAt,
+		UpdatedAt: feedFollows.UpdatedAt,
+		UserID: feedFollows.UserID,
+		FeedID: feedFollows.FeedID,
+	}
 }

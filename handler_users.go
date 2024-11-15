@@ -1,18 +1,17 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/ErebusAJ/rssagg/internal/database"
+	"github.com/ErebusAJ/rssagg/internal/decoder"
 	"github.com/google/uuid"
 )
 
-
-// Create User Handler method of apiConfig 
+// Create User Handler method of apiConfig
 // Takes arguments ResponseWriter
 // Decodes Parmaeter name from r.body
 // Calls sqlc CreateUser to create new user in database
@@ -22,13 +21,8 @@ func(cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request){
 		Name string `json:"name"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		errorHandler(w, http.StatusInternalServerError, fmt.Sprintf("couldn't decode parameter: %v", err))
-		return
-	}
+	var params parameters
+	decoder.Decode(r.Body, &params)
 
 	user, err := cfg.DB.CreateUser(r.Context(), database.CreateUserParams{
 		ID: uuid.New(),

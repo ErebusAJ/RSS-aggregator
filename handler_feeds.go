@@ -2,13 +2,13 @@ package main
 
 import (
 	"database/sql"
-	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 	"time"
 
 	"github.com/ErebusAJ/rssagg/internal/database"
+	"github.com/ErebusAJ/rssagg/internal/decoder"
 	"github.com/google/uuid"
 )
 
@@ -21,13 +21,9 @@ func (cfg *apiConfig) handlerCreateFeed(w http.ResponseWriter, r *http.Request, 
 		Title string `json:"title"`
 		URL   string `json:"url"`
 	}
-	decoder := json.NewDecoder(r.Body)
-	params := parameters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		log.Printf("error decoding request body: %v", err)
-		return
-	}
+
+	var params parameters
+	decoder.Decode(r.Body, &params)
 
 	data, err := cfg.DB.CreateFeed(r.Context(), database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -65,18 +61,12 @@ func (cfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 // Deletes feed based on feed_id, and authenticated user
 // If another user trie to delete feed throws error
 func (cfg *apiConfig) handlerDeleteFeed(w http.ResponseWriter, r *http.Request, user database.User) {
-	type paramters struct {
+	type parameters struct {
 		FeedID uuid.UUID `json:"feed_id"`
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	params := paramters{}
-	err := decoder.Decode(&params)
-	if err != nil {
-		errorHandler(w, http.StatusInternalServerError, "error decoding json")
-		log.Printf("error request body: %v", err)
-		return
-	}
+	var params parameters
+	decoder.Decode(r.Body, &params)
 
 	data, err := cfg.DB.DeleteFeed(r.Context(), database.DeleteFeedParams{
 		ID:     params.FeedID,
