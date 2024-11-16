@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ErebusAJ/rssagg/internal/database"
 	"github.com/go-chi/chi"
@@ -13,7 +14,6 @@ import (
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 )
-
 
 // Struct for DB queries
 type apiConfig struct{
@@ -29,7 +29,7 @@ func main(){
 	
 	portNo := os.Getenv("PORT")
 	if portNo == ""{
-		log.Print("error occurred retrieving portNo")
+		log.Fatal("error occurred retrieving portNo")
 	}
 
 
@@ -51,6 +51,9 @@ func main(){
 	apiCfg := apiConfig{
 		DB: db,
 	}
+
+	//Scrapper
+	go startScrapping(db, 10, time.Minute)
 
 
 	// Creating Router for our server
@@ -80,6 +83,7 @@ func main(){
 	v1Router.Get("/user", apiCfg.middlewareAuth(apiCfg.handlerGetUserByApiKey))
 	v1Router.Post("/user", apiCfg.handlerCreateUser)
 	v1Router.Delete("/user", apiCfg.middlewareAuth(apiCfg.handlerDeleteUser))
+	v1Router.Get("/posts", apiCfg.middlewareAuth(apiCfg.handlerGetUserPosts))
 	
 	//Feeds
 	v1Router.Get("/feeds", apiCfg.handlerGetFeeds)

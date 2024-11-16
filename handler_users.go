@@ -84,3 +84,20 @@ func(cfg *apiConfig) handlerDeleteUser(w http.ResponseWriter, r *http.Request, u
 
 	jsonHandler(w, http.StatusOK, Message{Text: "successfully deleted user"})
 }
+
+
+// get post handler
+func (cfg *apiConfig) handlerGetUserPosts(w http.ResponseWriter, r *http.Request, user database.User){
+	posts, err := cfg.DB.GetPostForUser(r.Context(), database.GetPostForUserParams{
+		UserID: user.ID,
+		Limit: 10,
+	})
+	if err != nil{
+		errorHandler(w, http.StatusInternalServerError, "no posts to show")
+		log.Printf("error retrieving post: %v", err)
+		return
+	}
+	for _, post := range posts{
+		jsonHandler(w, http.StatusOK, post)
+	}
+}
