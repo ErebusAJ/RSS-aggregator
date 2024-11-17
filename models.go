@@ -25,6 +25,14 @@ func databaseUserToUser(user database.User) Users{
 	}
 }
 
+func databaseUsersToUsers(users []database.User) []Users{
+	user := []Users{}
+	for _, item := range users{
+		user = append(user, databaseUserToUser(item))
+	}
+	return user
+}
+
 
 // Handling naming conventions for feeds table
 type Feed struct{
@@ -47,6 +55,14 @@ func databaseFeedToFeed(feed database.Feed) Feed{
 	}
 }
 
+func databaseFeedsToFeeds(dbfeed []database.Feed) []Feed{
+	feeds := []Feed{}
+	for _, dbFeed := range dbfeed{
+		feeds = append(feeds, databaseFeedToFeed(dbFeed))
+	}
+
+	return feeds
+}
 
 // A struct for msg
 type Message struct{
@@ -71,4 +87,13 @@ func databaseFeedFollowsToFeedFollows(feedFollows database.FeedFollow) FeedFollo
 		UserID: feedFollows.UserID,
 		FeedID: feedFollows.FeedID,
 	}
+}
+
+func databaseFeedsFollowsToFeedsFollows(feedsFollows []database.FeedFollow) []FeedFollows{
+	feedFollows := []FeedFollows{}
+	for _, item := range feedsFollows{
+		feedFollows = append(feedFollows, databaseFeedFollowsToFeedFollows(item))
+	}
+
+	return feedFollows
 }

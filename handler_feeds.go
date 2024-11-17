@@ -52,9 +52,7 @@ func (cfg *apiConfig) handlerGetFeeds(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, item := range feeds {
-		jsonHandler(w, http.StatusFound, databaseFeedToFeed(item))
-	}
+	jsonHandler(w, http.StatusFound, databaseFeedsToFeeds(feeds))
 }
 
 // DeleteFeed handler

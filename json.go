@@ -13,17 +13,26 @@ import (
 // --> Code : status code
 // --> Payload : incoming data struct
 // Return --> JSON encoded data
-func jsonHandler(w http.ResponseWriter, code int, payload interface{}){
-	data, err := json.Marshal(payload)
-	if err != nil {
-		log.Printf("error encoding to JSON: %v", err)
-		return
-	}
+func jsonHandler(w http.ResponseWriter, code int, payload interface{}) {
+    // Marshal the payload to JSON
+    data, err := json.Marshal(payload)
+    if err != nil {
+        log.Printf("error encoding to JSON: %v", err)
+        http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+        return
+    }
 
-	w.Header().Add("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(data)
+    // Set the Content-Type header
+    w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(code)
+
+    // Write the JSON response
+    _, err = w.Write(data)
+    if err != nil {
+        log.Printf("error writing response: %v", err)
+    }
 }
+
 
 
 // Error handler to return an error executing any reponse handler

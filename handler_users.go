@@ -50,9 +50,8 @@ func(cfg *apiConfig) handlerGetUsers(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	for _, user := range users{
-		jsonHandler(w, http.StatusOK, databaseUserToUser(user))
-	}
+	
+	jsonHandler(w, http.StatusOK, databaseUsersToUsers(users))
 }
 
 

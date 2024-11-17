@@ -61,10 +61,13 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed){
 		}
 
 		// handling published date
-		publisher_at, err := time.Parse(time.RFC3339, item.PublishDate)
+		published_at, err := time.Parse(time.RFC3339, item.PublishDate)
 		if err != nil {
-			log.Printf("error parsing date: %v", err)
-			continue
+			published_at, err = time.Parse(time.RFC1123Z, item.PublishDate)
+			if err != nil{
+				log.Printf("error parsing date: %v", err)
+				continue
+			}
 		}
 
 
@@ -75,7 +78,7 @@ func scrapeFeed(db *database.Queries, wg *sync.WaitGroup, feed database.Feed){
 			Title : item.Title,
 			Description: description,
 			Link: item.Link,
-			PublishedAt: publisher_at,
+			PublishedAt: published_at,
 			FeedID: feed.ID,
 		})
 		if err != nil {

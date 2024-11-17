@@ -53,9 +53,7 @@ func (cfg *apiConfig) handlerGetFeedFollows(w http.ResponseWriter, r *http.Reque
 		return
 	}
 
-	for _, data := range feed{
-		jsonHandler(w, http.StatusFound, databaseFeedFollowsToFeedFollows(data))
-	}
+	jsonHandler(w, http.StatusFound, databaseFeedsFollowsToFeedsFollows(feed))
 }
 
 
